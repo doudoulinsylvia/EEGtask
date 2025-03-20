@@ -1,0 +1,58 @@
+---
+title: "analysis"
+author: "LinDoudou"
+date: "2025-03-20"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr);library(readr);
+library(tidyverse)
+library(knitr)
+library(foreign)
+library(texreg)
+library(reshape2)
+
+Data <- read.csv("./behaviour_data.csv")
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library(rms)
+hlm0<-lrm(correct~rating+gainloss, data = Data,x=T,y=T)
+s0<-robcov(hlm0,cluster=Data$ID)
+s0
+
+
+hlm01<-lrm(correct~rating+gainloss+rating*gainloss, data = Data,x=T,y=T)
+s01<-robcov(hlm01,cluster=Data$ID)
+s01
+
+hlm011<-lrm(correct~rating, data = Data[Data$gainloss==1,],x=T,y=T)
+s011<-robcov(hlm011,cluster=Data[Data$gainloss==1,]$ID)
+s011
+
+data = Data[Data$gainloss==0,]
+hlm012<-lrm(correct~rating, data = Data[Data$gainloss==0,],x=T,y=T)
+s012<-robcov(hlm012,cluster=Data[Data$gainloss==0,]$ID)
+s012
+
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+OLS1<-knitreg(list(s0,s01,s011,s012),digits = 3, center = FALSE, caption = "behavior regression", table = FALSE)
+OLS1
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
